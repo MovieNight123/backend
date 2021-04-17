@@ -47,19 +47,19 @@ class Movie(models.Model):
 
 
 class MovieGenre(models.Model):
-	movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-	genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+	movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="movie_genres")
+	genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name="movie_genres")
 
 
 class Rating(models.Model):
 	value = models.IntegerField(validators=[MaxValueValidator(10), MinValueValidator(1)])
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
+	movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="ratings")
 
 
 class WatchListItem(models.Model):
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist_items")
+	movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="watchlist_items")
 
 
 class Review(models.Model):
@@ -73,8 +73,8 @@ class Review(models.Model):
 		('RU', 'RU'),
 	)
 
-	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+	movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
 	text = models.CharField(max_length=1024)
 	type = models.CharField(choices=TYPES, max_length=20)
 	language = models.CharField(choices=LANGUAGES, max_length=2)
