@@ -37,6 +37,9 @@ class Movie(models.Model):
 	budget = models.IntegerField()
 	revenue = models.IntegerField()
 	collection_id = models.IntegerField(null=True)
+	keywords = models.CharField(max_length=1024, default="")
+	content_based_recommendations = models.CharField(max_length=256, default="")
+	collaborative_recommendations = models.CharField(max_length=256, default="")
 
 	class Meta:
 		verbose_name = "Movie"

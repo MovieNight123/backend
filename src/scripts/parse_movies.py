@@ -29,7 +29,6 @@ def get_movies():
 
 
 def validate_movies(movies):
-	assert len(movies) == 10368, "Invalid total number"
 	cnt = [0] * 16
 	for i in range(len(movies)):
 		for j in range(16):
