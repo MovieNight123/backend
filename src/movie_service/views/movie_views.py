@@ -1,4 +1,5 @@
-from rest_framework import generics, mixins, viewsets
+from rest_framework import generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -7,12 +8,8 @@ from ..models import Movie, Genre, MovieGenre
 from ..serializers import MovieSerializer
 
 
-class MovieListViewSet(mixins.ListModelMixin,
-					   mixins.CreateModelMixin,
-					   mixins.RetrieveModelMixin,
-					   mixins.UpdateModelMixin,
-					   mixins.DestroyModelMixin,
-					   viewsets.GenericViewSet):
+class MovieListViewSet(viewsets.ModelViewSet):
+	http_method_names = ["get"]
 	permission_classes = (AllowAny,)
 	serializer_class = MovieSerializer
 	pagination_class = LimitOffsetPagination
@@ -44,6 +41,16 @@ class MovieListViewSet(mixins.ListModelMixin,
 			movies = Movie.objects.filter(movie_id__in=movie_ids)
 
 		return Response(MovieSerializer(movies, many=True).data)
+
+	@action(methods=["GET"], detail=True)
+	def recommendations(self, request, pk=None):
+		print("here")
+		movie_object = self.get_object()
+		recommendations = movie_object.content_based_recommendations
+		recommendations = [int(rec) for rec in recommendations.split()]
+		recommendations = Movie.objects.filter(movie_id__in=recommendations)
+		serializer = self.get_serializer(recommendations, many=True)
+		return Response(serializer.data)
 
 
 class MovieApiView(generics.RetrieveAPIView):
