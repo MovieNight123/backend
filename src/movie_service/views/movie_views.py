@@ -1,9 +1,9 @@
 from rest_framework import generics, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.authentication import TokenAuthentication
 
 from ..models import Movie, Genre, MovieGenre, Rating, User
 from ..serializers import MovieSerializer, RatingSerializer
@@ -19,8 +19,8 @@ class MovieListViewSet(viewsets.ModelViewSet):
 		return Movie.objects.all()
 
 	def list(self, request, *args, **kwargs):
-		filter_start_year = request.GET.get('start_year', 1999)
-		filter_end_year = request.GET.get('end_year', 1999)
+		filter_start_year = request.GET.get('start_year', 1850)
+		filter_end_year = request.GET.get('end_year', 2018)
 		filter_title = request.GET.get('title', '')
 		sort_by = request.GET.get('sort_by', 'year')
 		filter_genre = request.GET.get('genre')
@@ -64,28 +64,28 @@ class MovieApiView(generics.RetrieveAPIView):
 
 
 class RatingApiView(generics.RetrieveAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = RatingSerializer
-    queryset = Rating.objects.all()
+	authentication_classes = [TokenAuthentication]
+	permission_classes = [IsAuthenticated]
+	serializer_class = RatingSerializer
+	queryset = Rating.objects.all()
 
-    def post(self, request, *args, **kwargs):
-        movie = Movie.objects.get(movie_id=request.data.get('movie_id'))
-        rating_value = request.data.get('rating_value')
+	def post(self, request, *args, **kwargs):
+		movie = Movie.objects.get(movie_id=request.data.get('movie_id'))
+		rating_value = request.data.get('rating_value')
 
-        try:
-            user = User.objects.get(id=request.user.id)
-        except:
-            user = User.objects.create(id=request.user.id, name='n')
-        print(user, request.user.id)
+		try:
+			user = User.objects.get(id=request.user.id)
+		except:
+			user = User.objects.create(id=request.user.id, name='n')
+		print(user, request.user.id)
 
-        if movie and user and rating_value:
-            Rating.objects.create(user=user, movie=movie, value=rating_value)
+		if movie and user and rating_value:
+			Rating.objects.create(user=user, movie=movie, value=rating_value)
 
-            votes_sum = movie.vote_average * movie.vote_count + rating_value
-            movie.vote_count += 1
-            movie.vote_average = votes_sum / movie.vote_count
-            movie.save()
+			votes_sum = movie.vote_average * movie.vote_count + rating_value
+			movie.vote_count += 1
+			movie.vote_average = votes_sum / movie.vote_count
+			movie.save()
 
-            return Response('ok')
-        return Response('err')
+			return Response('ok')
+		return Response('err')
