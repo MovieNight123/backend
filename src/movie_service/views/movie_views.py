@@ -44,11 +44,10 @@ class MovieListViewSet(viewsets.ModelViewSet):
 
 	@action(methods=["GET"], detail=True)
 	def recommendations(self, request, pk=None):
-		print("here")
 		movie_object = self.get_object()
 		recommendations = movie_object.content_based_recommendations
 		recommendations = [int(rec) for rec in recommendations.split()]
-		recommendations = Movie.objects.filter(movie_id__in=recommendations)
+		recommendations = Movie.objects.filter(movie_id__in=recommendations).order_by("-popularity")
 		serializer = self.get_serializer(recommendations, many=True)
 		return Response(serializer.data)
 
